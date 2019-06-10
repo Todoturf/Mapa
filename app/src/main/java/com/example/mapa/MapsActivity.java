@@ -47,6 +47,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .title("Hipódromo de San Sebastián")
                 .snippet("El hipódromo estrella"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(hipodromo));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(hipodromo));
+        LatLng hipodromo2 = new LatLng(43.20, -2.00);
+        mMap.addMarker(new MarkerOptions().position(hipodromo2)
+                .title("Hipódromo de San Sebastián")
+                .snippet("El hipódromo estrella"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(hipodromo2));
+
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         try {

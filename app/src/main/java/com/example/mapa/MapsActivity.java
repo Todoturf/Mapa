@@ -1,19 +1,23 @@
 package com.example.mapa;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerDragListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
 
@@ -41,17 +45,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.setOnMapClickListener(this);
+
+        mMap.setOnMarkerDragListener(this);
+
+        mMap.setOnInfoWindowClickListener(this);
 
         LatLng hipodromo = new LatLng(43.26363, -2.023761);
-        mMap.addMarker(new MarkerOptions().position(hipodromo)
+        Marker marcadorHipodromo = mMap.addMarker(new MarkerOptions()
+                .position(hipodromo)
                 .title("Hipódromo de San Sebastián")
-                .snippet("El hipódromo estrella"));
+                .snippet("El hipódromo de las estrellas")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.horse))
+                .draggable(true)
+                .flat(true)
+                 );
         mMap.moveCamera(CameraUpdateFactory.newLatLng(hipodromo));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(hipodromo));
-        LatLng hipodromo2 = new LatLng(43.20, -2.00);
-        mMap.addMarker(new MarkerOptions().position(hipodromo2)
+
+        LatLng hipodromo2 = new LatLng(43.261028, -2.022826);
+        Marker marcadorHipodromo2 = mMap.addMarker(new MarkerOptions()
+                .position(hipodromo2)
                 .title("Hipódromo de San Sebastián")
-                .snippet("El hipódromo estrella"));
+                .snippet("Para darse un paseo")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.horse))
+                .draggable(true)
+                .flat(true)
+        );
         mMap.moveCamera(CameraUpdateFactory.newLatLng(hipodromo2));
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -69,6 +88,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (Resources.NotFoundException e) {
             Log.e("Mapa", "No puedo encontrar el estilo. Error: ", e);
         }
+    }
 
+    @Override
+    public void onMapClick(LatLng latLng)
+    {
+        mMap.addMarker(new MarkerOptions()
+        .position(latLng)
+                .title("Nueva posición")
+                .draggable(true)
+                .flat(true)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.home))
+        );
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker)
+    {
+        marker.hideInfoWindow();
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker)
+    {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker)
+    {
+        LatLng posicion = marker.getPosition();
+        marker.setSnippet(posicion.latitude + ", " + posicion.longitude);
+        marker.showInfoWindow();
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker)
+    {
+        //Toast.makeText(MapsActivity.this, marker.getTitle(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+        intent.putExtra("latitud", marker.getPosition().latitude);
+        intent.putExtra("longitud", marker.getPosition().longitude);
+        startActivity(intent);
     }
 }
